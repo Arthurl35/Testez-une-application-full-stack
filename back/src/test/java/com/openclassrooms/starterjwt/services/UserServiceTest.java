@@ -40,6 +40,6 @@ public class UserServiceTest {
 
         verify(userRepository).findById(1L);
 
-        assertEquals(expectedUser, actualUser, "The user returned by the service should match the expected user");
+        assertEquals(expectedUser, actualUser);
     }
 }
