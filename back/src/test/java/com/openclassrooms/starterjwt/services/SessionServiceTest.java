@@ -3,27 +3,24 @@ package com.openclassrooms.starterjwt.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import com.openclassrooms.starterjwt.exception.BadRequestException;
 import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Session;
-import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,11 +39,21 @@ public class SessionServiceTest {
     @InjectMocks
     private SessionService sessionService;
 
-    @Test
-    void testCreate() {
-        Session expectedSession = new Session();
+    private Session expectedSession;
+
+    private User expectedUser;
+
+    @BeforeEach
+    void init() {
+        expectedSession = new Session();
         expectedSession.setId(1L);
 
+        expectedUser = new User();
+        expectedUser.setId(1L);
+    }
+
+    @Test
+    void testCreate() {
         when(this.sessionRepository.save(eq(expectedSession))).thenReturn(expectedSession);
 
         Session actualSession = this.sessionService.create(expectedSession);
@@ -85,10 +92,6 @@ public class SessionServiceTest {
 
     @Test
     void testGetById() {
-    Session expectedSession = Session.builder()
-        .id(1L)
-        .build();
-
     when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
 
     Session actualSession = sessionService.getById(1L);
@@ -100,11 +103,7 @@ public class SessionServiceTest {
 
     @Test
     void testNoLongerParticipate() {
-        User user = new User();
-        user.setId(1L);
-        Session expectedSession = new Session();
-        expectedSession.setId(1L);
-        expectedSession.setUsers(Arrays.asList(user));
+        expectedSession.setUsers(Arrays.asList(expectedUser));
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
 
@@ -122,8 +121,6 @@ public class SessionServiceTest {
 
     @Test
     void testNoLongerParticipate_UserNotParticipating() {
-        Session expectedSession = new Session();
-        expectedSession.setId(1L);
         expectedSession.setUsers(new ArrayList<>());
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
@@ -133,20 +130,16 @@ public class SessionServiceTest {
 
     @Test
     void testParticipate() {
-        User user = new User();
-        user.setId(1L);
-        Session expectedSession = new Session();
-        expectedSession.setId(1L);
         expectedSession.setUsers(new ArrayList<>());
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
-        when(userRepository.findById(eq(1L))).thenReturn(Optional.of(user));
+        when(userRepository.findById(eq(1L))).thenReturn(Optional.of(expectedUser));
 
         sessionService.participate(1L, 1L);
 
         verify(sessionRepository).save(eq(expectedSession));
 
-        assertTrue(expectedSession.getUsers().contains(user));
+        assertTrue(expectedSession.getUsers().contains(expectedUser));
     }
 
     @Test
@@ -166,9 +159,6 @@ public class SessionServiceTest {
         
     @Test
     void testUpdate() {
-        Session expectedSession = new Session();
-        expectedSession.setId(1L);
-
         when(sessionRepository.save(eq(expectedSession))).thenReturn(expectedSession);
 
         Session actualSession = sessionService.update(1L, expectedSession);
