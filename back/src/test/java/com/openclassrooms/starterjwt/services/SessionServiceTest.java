@@ -3,8 +3,10 @@ package com.openclassrooms.starterjwt.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -155,6 +157,21 @@ public class SessionServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         
         assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
+    }
+
+    @Test
+    void testParticipate_AlreadyParticipating() {
+        Session expectedSession = new Session();
+        expectedSession.setId(1L);
+        expectedSession.setUsers(new ArrayList<>());
+        expectedSession.getUsers().add(expectedUser);
+
+        when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
+        when(userRepository.findById(eq(1L))).thenReturn(Optional.of(expectedUser));
+
+        assertThrows(BadRequestException.class, () -> sessionService.participate(1L, 1L));
+
+        verify(sessionRepository, never()).save(any(Session.class));
     }
         
     @Test
