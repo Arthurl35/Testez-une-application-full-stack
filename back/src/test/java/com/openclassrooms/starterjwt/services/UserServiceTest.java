@@ -2,6 +2,8 @@ package com.openclassrooms.starterjwt.services;
 
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.UserRepository;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,6 +25,14 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setId(1L);
+    }
+
     @Test
     void testDelete() {
         userService.delete(1L);
@@ -31,15 +41,12 @@ public class UserServiceTest {
 
     @Test
     void testFindById() {
-        User expectedUser = new User();
-        expectedUser.setId(1L);
-        
-        when(userRepository.findById(1L)).thenReturn(Optional.of(expectedUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         User actualUser = userService.findById(1L);
 
         verify(userRepository).findById(1L);
 
-        assertEquals(expectedUser, actualUser);
+        assertEquals(user, actualUser);
     }
 }
