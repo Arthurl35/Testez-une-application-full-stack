@@ -115,14 +115,14 @@ public class SessionServiceTest {
     }
 
     @Test
-    void testNoLongerParticipate_SessionNotFound() {
+    void testNoLongerParticipateSessionNotFound() {
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> sessionService.noLongerParticipate(1L, 1L));
     }
 
     @Test
-    void testNoLongerParticipate_UserNotParticipating() {
+    void testNoLongerParticipateUserNotParticipating() {
         expectedSession.setUsers(new ArrayList<>());
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
@@ -145,14 +145,14 @@ public class SessionServiceTest {
     }
 
     @Test
-    void testParticipate_SessionNotFound() {
+    void testParticipateSessionNotFound() {
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
     }
 
     @Test
-    void testParticipate_UserNotFound() {
+    void testParticipateUserNotFound() {
         when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(new Session()));
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         
@@ -160,7 +160,7 @@ public class SessionServiceTest {
     }
 
     @Test
-    void testParticipate_AlreadyParticipating() {
+    void testParticipateAlreadyParticipating() {
         Session expectedSession = new Session();
         expectedSession.setId(1L);
         expectedSession.setUsers(new ArrayList<>());

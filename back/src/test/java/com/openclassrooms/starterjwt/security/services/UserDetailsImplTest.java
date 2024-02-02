@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
 public class UserDetailsImplTest {
 
     private UserDetailsImpl user1;
@@ -28,7 +29,9 @@ public class UserDetailsImplTest {
 
     @Test
     void testEquals() {
-        assertEquals(user1, user2);
-        assertNotEquals(user1, user3);
+    assertEquals(user1, user1);
+    assertNotNull(user1);
+    assertEquals(user1, user2);
+    assertNotEquals(user1, user3);
     }
 }

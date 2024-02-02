@@ -26,13 +26,15 @@ public class TeacherServiceTest {
     @InjectMocks
     private TeacherService teacherService;
 
+    Teacher teacher1 = new Teacher(1L, "levesque1", "Arthur1", LocalDateTime.now(), LocalDateTime.now());
+    Teacher teacher2 = new Teacher(2L, "levesque2", "Arthur2", LocalDateTime.now(), LocalDateTime.now());
+
     private List<Teacher> teacherList;
+
 
     @BeforeEach
     void setUp() {
-        Teacher teacher1 = new Teacher(1L, "levesque1", "Arthur1", LocalDateTime.now(), LocalDateTime.now());
-        Teacher teacher2 = new Teacher(2L, "levesque2", "Arthur2", LocalDateTime.now(), LocalDateTime.now());
-        teacherList = Arrays.asList(teacher1, teacher2);
+        teacherList = List.of(teacher1, teacher2);
     }
 
     @Test
@@ -41,11 +43,7 @@ public class TeacherServiceTest {
 
         List<Teacher> result = teacherService.findAll();
 
-        assertEquals(2, result.size());
-        assertEquals("levesque1", result.get(0).getLastName());
-        assertEquals("Arthur1", result.get(0).getFirstName());
-        assertEquals("levesque2", result.get(1).getLastName());
-        assertEquals("Arthur2", result.get(1).getFirstName());
+        assertEquals(teacherList, result);
     }
 
     @Test
@@ -54,6 +52,7 @@ public class TeacherServiceTest {
 
         Teacher result = teacherService.findById(1L);
 
+        assertEquals(List.of(teacher1), result);
         assertNotNull(result);
         assertEquals("levesque1", result.getLastName());
         assertEquals("Arthur1", result.getFirstName());
