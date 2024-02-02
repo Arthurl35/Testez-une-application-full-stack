@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,11 +25,14 @@ public class TeacherServiceTest {
     @InjectMocks
     private TeacherService teacherService;
 
-    Teacher teacher1 = new Teacher(1L, "levesque1", "Arthur1", LocalDateTime.now(), LocalDateTime.now());
-    Teacher teacher2 = new Teacher(2L, "levesque2", "Arthur2", LocalDateTime.now(), LocalDateTime.now());
+    Teacher teacher1 = new Teacher(1L, "levesque1", "Arthur1", 
+                        LocalDateTime.of(2022, 1, 1, 0, 0), 
+                        LocalDateTime.of(2022, 1, 1, 0, 0));
+    Teacher teacher2 = new Teacher(2L, "levesque2", "Arthur2", 
+                        LocalDateTime.of(2022, 1, 1, 0, 0), 
+                        LocalDateTime.of(2022, 1, 1, 0, 0));
 
     private List<Teacher> teacherList;
-
 
     @BeforeEach
     void setUp() {
@@ -52,9 +54,6 @@ public class TeacherServiceTest {
 
         Teacher result = teacherService.findById(1L);
 
-        assertEquals(List.of(teacher1), result);
-        assertNotNull(result);
-        assertEquals("levesque1", result.getLastName());
-        assertEquals("Arthur1", result.getFirstName());
+        assertEquals(teacher1, result);
     }
 }
