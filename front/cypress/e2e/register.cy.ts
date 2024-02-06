@@ -42,7 +42,7 @@ describe('Register spec', () => {
 
     cy.get('input[formControlName="firstName"]').type('AAAA');
     cy.get('input[formControlName="lastName"]').type('LLLLLL');
-    cy.get('input[formControlName="email"]').type('AAAA@example');
+    cy.get('input[formControlName="email"]').type('AAAA@lllll');
     cy.get('input[formControlName="password"]').type('test1234444{enter}');
 
     cy.get('.error').should('be.visible');
