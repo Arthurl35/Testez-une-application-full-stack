@@ -5,11 +5,12 @@ import { SessionInformation } from '../interfaces/sessionInformation.interface';
 
 describe('SessionService', () => {
   let service: SessionService;
+  let user: SessionInformation;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(SessionService);
-    const user: SessionInformation = {
+    user = {
       token: 'token',
       type: 'type',
       id: 1,

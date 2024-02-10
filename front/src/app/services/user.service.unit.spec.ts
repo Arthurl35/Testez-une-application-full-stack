@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { UserService } from './user.service';
 import { User } from '../interfaces/user.interface';
-import { expect } from 'chai';
 
 describe('UserService', () => {
   let service: UserService;
@@ -11,7 +10,6 @@ describe('UserService', () => {
   // Avant chaque test, on configure le module de test
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [UserService],        // Déclarer le service à tester
       imports: [HttpClientTestingModule], // Importer le module HttpClientTestingModule pour pouvoir tester les requêtes HTTP
       providers: [UserService]            // Fournir le service à tester
     });
@@ -39,9 +37,11 @@ describe('UserService', () => {
       firstName: 'levesque',
       admin: false,
       password: 'test!1234',
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
-    service.getById(1).subscribe(user => {
+    service.getById('1').subscribe(user => {
       expect(user).toEqual(mockUser); 
     });
 
@@ -52,7 +52,7 @@ describe('UserService', () => {
 
   // Test pour vérifier que le service supprime bien l'utilisateur par son id
   it('should delete user by id', () => {
-    service.delete(1).subscribe(response => {
+    service.delete('1').subscribe(response => {
       expect(response).toEqual({});
     });
 
