@@ -5,9 +5,8 @@ describe('Session spec', () => {
     cy.intercept('POST', '/api/auth/login', {
       body: {
         id: 1,
-        username: 'userName',
-        firstName: 'firstName',
-        lastName: 'lastName',
+        firstName: 'Arthur',
+        lastName: 'LEVESQUE',
         admin: true
       },
     })
@@ -34,6 +33,8 @@ describe('Session spec', () => {
           id: 1,
           firstName: 'Margot',
           lastName: 'DELAHAYE',
+          createdAt: '2022-01-01T00:00:00.000+00:00',
+          updatedAt: '2022-01-01T00:00:00.000+00:00'
         }
       ]
     });
@@ -160,6 +161,8 @@ describe('Session spec', () => {
           id: 1,
           firstName: 'Margot',
           lastName: 'DELAHAYE',
+          createdAt: '2022-01-01T00:00:00.000+00:00',
+          updatedAt: '2022-01-01T00:00:00.000+00:00'
         }
     });
 
