@@ -13,6 +13,9 @@ import { SessionApiService } from '../../services/session-api.service';
   styleUrls: ['./form.component.scss']
 })
 export class FormComponent implements OnInit {
+  submitForm() {
+    throw new Error('Method not implemented.');
+  }
 
   public onUpdate: boolean = false;
   public sessionForm: FormGroup | undefined;
