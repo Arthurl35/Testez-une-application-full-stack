@@ -18,7 +18,7 @@ The application's front-end is developed in Angular.
 
 Go to front folder:
 
-> cd Testez-une-application-full-stack
+> cd /front
 
 Install dependencies:
 
@@ -52,6 +52,10 @@ E2E:
 ## Back
 
 The application's back-end is developed in Java Spring.
+
+Go to back folder:
+
+> cd /back
 
 Do the tests with:
 
