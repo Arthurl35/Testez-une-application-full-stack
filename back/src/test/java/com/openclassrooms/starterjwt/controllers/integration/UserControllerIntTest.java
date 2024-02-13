@@ -45,9 +45,6 @@ public class UserControllerIntTest {
 
     @BeforeEach
     public void setup() {
-        Mockito.when(jwtUtils.generateJwtToken(any(Authentication.class))).thenReturn("token");
-        Mockito.when(jwtUtils.validateJwtToken(anyString())).thenReturn(true);
-
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setEmail("yoga@studio.com");

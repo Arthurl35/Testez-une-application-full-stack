@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class SessionServiceTest {
 
+    //Initailisation des mocks
     @Mock
     private SessionRepository sessionRepository;
 
@@ -56,111 +57,134 @@ public class SessionServiceTest {
 
     @Test
     void testCreate() {
-        when(this.sessionRepository.save(eq(expectedSession))).thenReturn(expectedSession);
+        // Arrange (Configuration des mocks)
+        when(this.sessionRepository.save(expectedSession)).thenReturn(expectedSession);
 
+        // Act (Exécution de la méthode à tester)
         Session actualSession = this.sessionService.create(expectedSession);
 
-        verify(this.sessionRepository).save(eq(expectedSession));
-
+        // Assert (Vérification des résultats)
+        verify(this.sessionRepository).save(expectedSession);
         assertEquals(expectedSession, actualSession);
     }
 
     @Test
     void testDelete() {
+        // Arrange & Act
         sessionService.delete(1L);
+
+        // Assert
         verify(this.sessionRepository).deleteById(eq(1L));
     }
 
     @Test
     void testFindAll() {
-    List<Session> expectedSessions = new ArrayList<>();
-    expectedSessions.add(Session.builder()
-        .id(1L)
-        .name("Session 1")
-        .build());
-    expectedSessions.add(Session.builder()
-        .id(2L)
-        .name("Session 2")
-        .build());
+        // Arrange
+        List<Session> expectedSessions = new ArrayList<>();
+        expectedSessions.add(Session.builder()
+            .id(1L)
+            .name("Session 1")
+            .build());
+        expectedSessions.add(Session.builder()
+            .id(2L)
+            .name("Session 2")
+            .build());
 
-    when(sessionRepository.findAll()).thenReturn(expectedSessions);
+        when(sessionRepository.findAll()).thenReturn(expectedSessions);
 
-    List<Session> actualSessions = sessionService.findAll();
+        // Act
+        List<Session> actualSessions = sessionService.findAll();
 
-    verify(sessionRepository).findAll();
-
-    assertEquals(expectedSessions, actualSessions);
+        // Assert
+        verify(sessionRepository).findAll();
+        assertEquals(expectedSessions, actualSessions);
     }
 
     @Test
     void testGetById() {
-    when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
+        // Arrange
+        when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
 
-    Session actualSession = sessionService.getById(1L);
+        // Act
+        Session actualSession = sessionService.getById(1L);
 
-    verify(sessionRepository).findById(eq(1L));
-
-    assertEquals(expectedSession, actualSession);
+        // Assert
+        verify(sessionRepository).findById(eq(1L));
+        assertEquals(expectedSession, actualSession);
     }
 
     @Test
     void testNoLongerParticipate() {
+        // Arrange
         expectedSession.setUsers(Arrays.asList(expectedUser));
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
 
+        // Act
         sessionService.noLongerParticipate(1L, 1L);
 
+        // Assert
         verify(sessionRepository).save(eq(expectedSession));
     }
 
     @Test
     void testNoLongerParticipateSessionNotFound() {
+        // Arrange
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(NotFoundException.class, () -> sessionService.noLongerParticipate(1L, 1L));
     }
 
     @Test
     void testNoLongerParticipateUserNotParticipating() {
+        // Arrange
         expectedSession.setUsers(new ArrayList<>());
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
 
+        // Act & Assert
         assertThrows(BadRequestException.class, () -> sessionService.noLongerParticipate(1L, 1L));
     }
 
     @Test
     void testParticipate() {
+        // Arrange
         expectedSession.setUsers(new ArrayList<>());
 
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
         when(userRepository.findById(eq(1L))).thenReturn(Optional.of(expectedUser));
 
+        // Act
         sessionService.participate(1L, 1L);
 
+        // Assert
         verify(sessionRepository).save(eq(expectedSession));
-
         assertTrue(expectedSession.getUsers().contains(expectedUser));
     }
 
     @Test
     void testParticipateSessionNotFound() {
+        // Arrange
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
     }
 
     @Test
     void testParticipateUserNotFound() {
+        // Arrange
         when(sessionRepository.findById(anyLong())).thenReturn(Optional.of(new Session()));
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        
+
+        // Act & Assert
         assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
     }
 
     @Test
     void testParticipateAlreadyParticipating() {
+        // Arrange
         Session expectedSession = new Session();
         expectedSession.setId(1L);
         expectedSession.setUsers(new ArrayList<>());
@@ -169,19 +193,22 @@ public class SessionServiceTest {
         when(sessionRepository.findById(eq(1L))).thenReturn(Optional.of(expectedSession));
         when(userRepository.findById(eq(1L))).thenReturn(Optional.of(expectedUser));
 
+        // Act & Assert
         assertThrows(BadRequestException.class, () -> sessionService.participate(1L, 1L));
 
         verify(sessionRepository, never()).save(any(Session.class));
     }
-        
+
     @Test
     void testUpdate() {
+        // Arrange
         when(sessionRepository.save(eq(expectedSession))).thenReturn(expectedSession);
 
+        // Act
         Session actualSession = sessionService.update(1L, expectedSession);
 
+        // Assert
         verify(sessionRepository).save(eq(expectedSession));
-
         assertEquals(expectedSession, actualSession);
     }
 }

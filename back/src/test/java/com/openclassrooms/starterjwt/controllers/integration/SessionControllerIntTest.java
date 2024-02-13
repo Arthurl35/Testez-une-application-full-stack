@@ -57,15 +57,14 @@ public class SessionControllerIntTest {
 
     @BeforeEach
     public void setup() {
-        Mockito.when(jwtUtils.generateJwtToken(any(Authentication.class))).thenReturn("token");
-        Mockito.when(jwtUtils.validateJwtToken(anyString())).thenReturn(true);
-
+        // Configuration du mock de Session pour getById
         Session mockSession = new Session();
         mockSession.setId(1L);
         mockSession.setName("Yoga");
-
+        // Configuration du mock de SessionService pour getById
         Mockito.when(sessionService.getById(1L)).thenReturn(mockSession);
 
+        // Configuration du mock de Session pour findAll
         sessionDto = new SessionDto();
         sessionDto.setName("new session");
         sessionDto.setDescription("this is a new session");

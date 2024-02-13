@@ -44,9 +44,6 @@ public class TeacherControllerIntTest {
 
     @BeforeEach
     public void setup() {
-        Mockito.when(jwtUtils.generateJwtToken(any(Authentication.class))).thenReturn("token");
-        Mockito.when(jwtUtils.validateJwtToken(anyString())).thenReturn(true);
-
         Teacher mockTeacher = new Teacher();
         mockTeacher.setId(1L);
         

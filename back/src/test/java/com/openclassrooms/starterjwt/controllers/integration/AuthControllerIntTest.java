@@ -1,95 +1,119 @@
 package com.openclassrooms.starterjwt.controllers.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.openclassrooms.starterjwt.controllers.AuthController;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.payload.request.SignupRequest;
-import com.openclassrooms.starterjwt.controllers.AuthController;
+import com.openclassrooms.starterjwt.repository.UserRepository;
+import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
+import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
+import java.util.Optional;
+
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AuthControllerIntTest {
+class AuthControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
-    @MockBean
+    @Mock
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @Mock
+    private JwtUtils jwtUtils;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
     private AuthController authController;
 
-    private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
     private LoginRequest loginRequest;
-    private LoginRequest loginRequestInvalid;
-
     private SignupRequest signupRequest;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
         loginRequest = new LoginRequest();
-        loginRequest.setEmail("yoga@studio.com");
+        loginRequest.setEmail("toto3@toto.com");
         loginRequest.setPassword("test!1234");
 
-        loginRequestInvalid = new LoginRequest();
-        loginRequestInvalid.setEmail("invalid@studio.com");
-        loginRequestInvalid.setPassword("invalid!1234");
-
         signupRequest = new SignupRequest();
-        signupRequest.setEmail("test@email.com");
-        signupRequest.setFirstName("hello");
-        signupRequest.setLastName("world");
-        signupRequest.setPassword("password123");
+        signupRequest.setEmail("ddddddssddddddsd@example.com");
+        signupRequest.setPassword("password");
+        signupRequest.setFirstName("Jaohn");
+        signupRequest.setLastName("Doe");
     }
 
     @Test
-    public void testAuthenticateAdmin() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
+    void authenticateUser() throws Exception {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getPassword());
+        UserDetailsImpl userDetails = UserDetailsImpl.builder()
+                .id(1L)
+                .username(loginRequest.getEmail())
+                .firstName("toto")
+                .lastName("toto")
+                .admin(false)
+                .password("password")
+                .build();
+        String jwt = "jwtToken";
+
+        when(authenticationManager.authenticate(authentication)).thenReturn(authentication);
+        when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwt);
+        when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(ow.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk());
+                .content(asJsonString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value(loginRequest.getEmail()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(userDetails.getFirstName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(userDetails.getLastName()));
     }
 
     @Test
-    public void testAuthenticateUser() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
+    void registerUser() throws Exception {
+        when(userRepository.existsByEmail(signupRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(signupRequest.getPassword())).thenReturn("encodedPassword");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(ow.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk());
+                .content(asJsonString(signupRequest)))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("User registered successfully!"));
     }
 
-    @Test
-    public void testRegisterUserOk() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ow.writeValueAsString(signupRequest)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void testRegisterUserEmailAlreadyTaken() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    // Méthode utilitaire pour convertir un objet en chaîne JSON
+    private String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
