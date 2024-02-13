@@ -57,7 +57,17 @@ Go to back folder:
 
 > cd /back
 
+Launch Back-end:
+
+> mvn spring-boot:run;
+
+### Test
+
 Do the tests with:
 
 > mvn clean test;
+
+### Coverage
+
+Go to the jococo folder: `back/target/site/jacoco/index.html`
 
